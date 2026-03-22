@@ -10,7 +10,6 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 model User {
@@ -31,7 +30,7 @@ model Application {
   location    String?
   url         String?
   salaryRange String?
-  status      String   // keep as String for MVP
+  status      String
   appliedDate DateTime?
   notes       String?
 
