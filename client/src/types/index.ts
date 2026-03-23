@@ -37,3 +37,15 @@ export type CreateApplicationInput = {
   appliedDate?: string;
   notes?: string;
 };
+
+export type UpdateApplicationInput = Partial<{
+  company: string;
+  roleTitle: string;
+  location: string;
+  url: string;
+  salaryRange: string;
+  status: ApplicationStatus;
+  appliedDate: string;
+  notes: string;
+  position: number;
+}>;
