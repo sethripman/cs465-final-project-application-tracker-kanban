@@ -26,3 +26,14 @@ export type JobApplication = {
   createdAt: string;
   updatedAt: string;
 };
+
+export type CreateApplicationInput = {
+  company: string;
+  roleTitle: string;
+  location?: string;
+  url?: string;
+  salaryRange?: string;
+  status: ApplicationStatus;
+  appliedDate?: string;
+  notes?: string;
+};
