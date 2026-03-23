@@ -6,6 +6,7 @@ import type {
   ApplicationStatus,
   CreateApplicationInput,
   JobApplication,
+  UpdateApplicationInput,
 } from "../types";
 import { APPLICATION_STATUSES, STATUS_LABELS } from "../constants";
 import ApplicationForm, {
@@ -20,6 +21,20 @@ type CreateApplicationResponse = {
   application: JobApplication;
 };
 
+type UpdateApplicationResponse = {
+  application: JobApplication;
+};
+
+function toDateTimeLocalValue(value: string | null): string {
+  if (!value) return "";
+
+  const date = new Date(value);
+  const timezoneOffset = date.getTimezoneOffset() * 60000;
+  const localDate = new Date(date.getTime() - timezoneOffset);
+
+  return localDate.toISOString().slice(0, 16);
+}
+
 export default function BoardPage() {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
@@ -28,6 +43,7 @@ export default function BoardPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [showCreateForm, setShowCreateForm] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
 
   async function loadApplications() {
     try {
@@ -68,7 +84,7 @@ export default function BoardPage() {
       await logout();
       navigate("/login");
     } catch {
-      // keep minimal for now
+      // minimal for now
     }
   }
 
@@ -95,6 +111,75 @@ export default function BoardPage() {
     setShowCreateForm(false);
   }
 
+  async function handleUpdateApplication(
+    id: string,
+    values: ApplicationFormValues
+  ) {
+    const payload: UpdateApplicationInput = {
+      company: values.company,
+      roleTitle: values.roleTitle,
+      location: values.location || "",
+      url: values.url || "",
+      salaryRange: values.salaryRange || "",
+      status: values.status,
+      appliedDate: values.appliedDate
+        ? new Date(values.appliedDate).toISOString()
+        : "",
+      notes: values.notes || "",
+    };
+
+    const data = await apiFetch<UpdateApplicationResponse>(
+      `/applications/${id}`,
+      {
+        method: "PATCH",
+        body: payload,
+      }
+    );
+
+    setApplications((prev) =>
+      prev.map((application) =>
+        application.id === id ? data.application : application
+      )
+    );
+
+    setEditingId(null);
+  }
+
+  async function handleDeleteApplication(id: string) {
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this application?"
+    );
+
+    if (!confirmed) return;
+
+    await apiFetch<{ message: string }>(`/applications/${id}`, {
+      method: "DELETE",
+    });
+
+    setApplications((prev) =>
+      prev.filter((application) => application.id !== id)
+    );
+  }
+
+  async function handleQuickStatusChange(
+    id: string,
+    status: ApplicationStatus
+  ) {
+    const data = await apiFetch<UpdateApplicationResponse>(
+      `/applications/${id}`,
+      {
+        method: "PATCH",
+        body: { status },
+      }
+    );
+
+    setApplications((prev) =>
+      prev.map((application) =>
+        application.id === id ? data.application : application
+      )
+    );
+  }
+
   return (
     <main style={{ padding: "1.5rem" }}>
       <header
@@ -113,7 +198,12 @@ export default function BoardPage() {
         </div>
 
         <div style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap" }}>
-          <button onClick={() => setShowCreateForm((prev) => !prev)}>
+          <button
+            onClick={() => {
+              setShowCreateForm((prev) => !prev);
+              setEditingId(null);
+            }}
+          >
             {showCreateForm ? "Close Form" : "Add Application"}
           </button>
           <button onClick={handleLogout}>Logout</button>
@@ -173,42 +263,153 @@ export default function BoardPage() {
                   <p style={{ color: "#666" }}>No applications</p>
                 ) : (
                   <div style={{ display: "grid", gap: "0.75rem" }}>
-                    {items.map((application) => (
-                      <article
-                        key={application.id}
-                        style={{
-                          border: "1px solid #ddd",
-                          borderRadius: "8px",
-                          padding: "0.75rem",
-                          background: "#fff",
-                        }}
-                      >
-                        <h3 style={{ marginTop: 0, marginBottom: "0.5rem" }}>
-                          {application.company}
-                        </h3>
-                        <p style={{ margin: "0 0 0.5rem 0" }}>
-                          <strong>Role:</strong> {application.roleTitle}
-                        </p>
+                    {items.map((application) => {
+                      const isEditing = editingId === application.id;
 
-                        {application.location ? (
-                          <p style={{ margin: "0 0 0.5rem 0" }}>
-                            <strong>Location:</strong> {application.location}
-                          </p>
-                        ) : null}
+                      return (
+                        <article
+                          key={application.id}
+                          style={{
+                            border: "1px solid #ddd",
+                            borderRadius: "8px",
+                            padding: "0.75rem",
+                            background: "#fff",
+                          }}
+                        >
+                          {isEditing ? (
+                            <>
+                              <h3 style={{ marginTop: 0 }}>Edit Application</h3>
+                              <ApplicationForm
+                                submitLabel="Save Changes"
+                                initialValues={{
+                                  company: application.company,
+                                  roleTitle: application.roleTitle,
+                                  location: application.location ?? "",
+                                  url: application.url ?? "",
+                                  salaryRange: application.salaryRange ?? "",
+                                  status: application.status,
+                                  appliedDate: toDateTimeLocalValue(
+                                    application.appliedDate
+                                  ),
+                                  notes: application.notes ?? "",
+                                }}
+                                onSubmit={(values) =>
+                                  handleUpdateApplication(application.id, values)
+                                }
+                                onCancel={() => setEditingId(null)}
+                              />
+                            </>
+                          ) : (
+                            <>
+                              <h3 style={{ marginTop: 0, marginBottom: "0.5rem" }}>
+                                {application.company}
+                              </h3>
 
-                        {application.salaryRange ? (
-                          <p style={{ margin: "0 0 0.5rem 0" }}>
-                            <strong>Salary:</strong> {application.salaryRange}
-                          </p>
-                        ) : null}
+                              <p style={{ margin: "0 0 0.5rem 0" }}>
+                                <strong>Role:</strong> {application.roleTitle}
+                              </p>
 
-                        {application.notes ? (
-                          <p style={{ margin: 0 }}>
-                            <strong>Notes:</strong> {application.notes}
-                          </p>
-                        ) : null}
-                      </article>
-                    ))}
+                              {application.location ? (
+                                <p style={{ margin: "0 0 0.5rem 0" }}>
+                                  <strong>Location:</strong> {application.location}
+                                </p>
+                              ) : null}
+
+                              {application.salaryRange ? (
+                                <p style={{ margin: "0 0 0.5rem 0" }}>
+                                  <strong>Salary:</strong> {application.salaryRange}
+                                </p>
+                              ) : null}
+
+                              {application.url ? (
+                                <p style={{ margin: "0 0 0.5rem 0" }}>
+                                  <strong>Link:</strong>{" "}
+                                  <a
+                                    href={application.url}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                  >
+                                    Job Posting
+                                  </a>
+                                </p>
+                              ) : null}
+
+                              {application.appliedDate ? (
+                                <p style={{ margin: "0 0 0.5rem 0" }}>
+                                  <strong>Applied:</strong>{" "}
+                                  {new Date(
+                                    application.appliedDate
+                                  ).toLocaleString()}
+                                </p>
+                              ) : null}
+
+                              {application.notes ? (
+                                <p style={{ margin: "0 0 0.75rem 0" }}>
+                                  <strong>Notes:</strong> {application.notes}
+                                </p>
+                              ) : null}
+
+                              <div
+                                style={{
+                                  display: "grid",
+                                  gap: "0.5rem",
+                                  marginTop: "0.75rem",
+                                }}
+                              >
+                                <label>
+                                  <span style={{ display: "block", marginBottom: "0.25rem" }}>
+                                    Change Status
+                                  </span>
+                                  <select
+                                    value={application.status}
+                                    onChange={(event) =>
+                                      void handleQuickStatusChange(
+                                        application.id,
+                                        event.target.value as ApplicationStatus
+                                      )
+                                    }
+                                    style={{ width: "100%" }}
+                                  >
+                                    {APPLICATION_STATUSES.map((nextStatus) => (
+                                      <option key={nextStatus} value={nextStatus}>
+                                        {STATUS_LABELS[nextStatus]}
+                                      </option>
+                                    ))}
+                                  </select>
+                                </label>
+
+                                <div
+                                  style={{
+                                    display: "flex",
+                                    gap: "0.5rem",
+                                    flexWrap: "wrap",
+                                  }}
+                                >
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setEditingId(application.id);
+                                      setShowCreateForm(false);
+                                    }}
+                                  >
+                                    Edit
+                                  </button>
+
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      void handleDeleteApplication(application.id)
+                                    }
+                                  >
+                                    Delete
+                                  </button>
+                                </div>
+                              </div>
+                            </>
+                          )}
+                        </article>
+                      );
+                    })}
                   </div>
                 )}
               </div>

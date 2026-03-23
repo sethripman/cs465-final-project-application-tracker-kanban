@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { ApplicationStatus, JobApplication } from "../types";
+import type { ApplicationStatus } from "../types";
 import { APPLICATION_STATUSES, STATUS_LABELS } from "../constants";
 
 export type ApplicationFormValues = {
@@ -161,7 +161,7 @@ export default function ApplicationForm({
 
       {error ? <p style={{ color: "crimson" }}>{error}</p> : null}
 
-      <div style={{ display: "flex", gap: "0.75rem" }}>
+      <div style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap" }}>
         <button type="submit" disabled={submitting}>
           {submitting ? "Saving..." : submitLabel}
         </button>
