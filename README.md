@@ -162,10 +162,10 @@ npx prisma migrate dev
 
 ### Project Structure
 
-root/
-client/ → React + TypeScript frontend
-server/ → Express + TypeScript backend
-docker-compose.yml
+- root/
+- client/ → React + TypeScript frontend
+- server/ → Express + TypeScript backend
+- docker-compose.yml
 
 ---
 
