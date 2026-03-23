@@ -69,7 +69,7 @@ export default function ApplicationForm({
   }
 
   return (
-    <form onSubmit={handleSubmit} style={{ display: "grid", gap: "0.75rem" }}>
+    <form className="app-form" onSubmit={handleSubmit}>
       <label>
         Company
         <input
@@ -77,7 +77,6 @@ export default function ApplicationForm({
           value={values.company}
           onChange={(event) => updateField("company", event.target.value)}
           required
-          style={{ display: "block", width: "100%", marginTop: "0.25rem" }}
         />
       </label>
 
@@ -88,7 +87,6 @@ export default function ApplicationForm({
           value={values.roleTitle}
           onChange={(event) => updateField("roleTitle", event.target.value)}
           required
-          style={{ display: "block", width: "100%", marginTop: "0.25rem" }}
         />
       </label>
 
@@ -98,7 +96,6 @@ export default function ApplicationForm({
           type="text"
           value={values.location}
           onChange={(event) => updateField("location", event.target.value)}
-          style={{ display: "block", width: "100%", marginTop: "0.25rem" }}
         />
       </label>
 
@@ -108,7 +105,6 @@ export default function ApplicationForm({
           type="url"
           value={values.url}
           onChange={(event) => updateField("url", event.target.value)}
-          style={{ display: "block", width: "100%", marginTop: "0.25rem" }}
         />
       </label>
 
@@ -118,7 +114,6 @@ export default function ApplicationForm({
           type="text"
           value={values.salaryRange}
           onChange={(event) => updateField("salaryRange", event.target.value)}
-          style={{ display: "block", width: "100%", marginTop: "0.25rem" }}
         />
       </label>
 
@@ -129,7 +124,6 @@ export default function ApplicationForm({
           onChange={(event) =>
             updateField("status", event.target.value as ApplicationStatus)
           }
-          style={{ display: "block", width: "100%", marginTop: "0.25rem" }}
         >
           {APPLICATION_STATUSES.map((status) => (
             <option key={status} value={status}>
@@ -145,7 +139,6 @@ export default function ApplicationForm({
           type="datetime-local"
           value={values.appliedDate}
           onChange={(event) => updateField("appliedDate", event.target.value)}
-          style={{ display: "block", width: "100%", marginTop: "0.25rem" }}
         />
       </label>
 
@@ -155,13 +148,12 @@ export default function ApplicationForm({
           value={values.notes}
           onChange={(event) => updateField("notes", event.target.value)}
           rows={4}
-          style={{ display: "block", width: "100%", marginTop: "0.25rem" }}
         />
       </label>
 
-      {error ? <p style={{ color: "crimson" }}>{error}</p> : null}
+      {error ? <p className="text-error">{error}</p> : null}
 
-      <div style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap" }}>
+      <div className="app-form-actions">
         <button type="submit" disabled={submitting}>
           {submitting ? "Saving..." : submitLabel}
         </button>

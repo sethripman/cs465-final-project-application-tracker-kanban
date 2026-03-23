@@ -1,10 +1,15 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap');
+
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: 'Inter', system-ui, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
   color: #1f2933;
-  background-color: #f3f4f6;
+  background:
+    radial-gradient(circle at top left, rgba(99, 102, 241, 0.08), transparent 30%),
+    radial-gradient(circle at top right, rgba(16, 185, 129, 0.08), transparent 28%),
+    linear-gradient(180deg, #f8fafc 0%, #eef2f7 100%);
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -16,12 +21,35 @@
   box-sizing: border-box;
 }
 
-body {
+html,
+body,
+#root {
   margin: 0;
   min-height: 100vh;
 }
 
-/* Center layout utility for auth pages */
+body {
+  min-height: 100vh;
+}
+
+h1,
+h2,
+h3 {
+  font-family: 'Space Grotesk', 'Inter', system-ui, sans-serif;
+  letter-spacing: -0.02em;
+}
+
+a {
+  color: #4338ca;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
 .auth-page {
   min-height: 100vh;
   display: flex;
@@ -30,17 +58,19 @@ body {
   padding: 2rem;
 }
 
-/* Card container */
 .auth-card {
   width: 100%;
-  max-width: 420px;
-  background: white;
+  max-width: 380px;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(6px);
   padding: 2rem;
-  border-radius: 12px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+  border-radius: 16px;
+  box-shadow:
+    0 10px 25px rgba(15, 23, 42, 0.10),
+    0 2px 8px rgba(15, 23, 42, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.7);
 }
 
-/* Form spacing */
 .auth-card h1 {
   margin-top: 0;
   margin-bottom: 1.25rem;
@@ -59,28 +89,52 @@ body {
 
 .auth-card input,
 .auth-card textarea,
-.auth-card select {
+.auth-card select,
+.app-form input,
+.app-form textarea,
+.app-form select {
   margin-top: 0.25rem;
   width: 100%;
-  padding: 0.5rem;
-  border-radius: 6px;
+  padding: 0.65rem 0.75rem;
+  border-radius: 10px;
   border: 1px solid #d1d5db;
-  font-size: 0.95rem;
+  background: #ffffff;
+  color: #111827;
+  transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
 }
 
-.auth-card button {
-  margin-top: 0.5rem;
-  padding: 0.6rem;
-  border-radius: 8px;
+.auth-card input:focus,
+.auth-card textarea:focus,
+.auth-card select:focus,
+.app-form input:focus,
+.app-form textarea:focus,
+.app-form select:focus {
+  outline: none;
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+}
+
+button {
+  padding: 0.7rem 0.95rem;
+  border-radius: 5px;
   border: none;
-  background: #4f46e5;
+  background: linear-gradient(135deg, #4f46e5, #6366f1);
   color: white;
   font-weight: 600;
   cursor: pointer;
+  transition: transform 160ms ease, box-shadow 160ms ease, opacity 160ms ease;
+  box-shadow: 0 8px 18px rgba(79, 70, 229, 0.20);
 }
 
-.auth-card button:hover {
-  background: #4338ca;
+button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 24px rgba(79, 70, 229, 0.25);
+}
+
+button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
 }
 
 .auth-card a {
@@ -91,4 +145,167 @@ body {
 
 .auth-card a:hover {
   text-decoration: underline;
+}
+
+/* Board styles */
+.board-page {
+  min-height: 100vh;
+  padding: 1.5rem;
+}
+
+.board-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.board-title {
+  margin: 0;
+  font-size: 2rem;
+}
+
+.board-subtitle {
+  margin-top: 0.5rem;
+  color: #4b5563;
+}
+
+.board-actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.board-form-panel {
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  box-shadow:
+    0 12px 28px rgba(15, 23, 42, 0.08),
+    0 2px 10px rgba(15, 23, 42, 0.04);
+  backdrop-filter: blur(6px);
+}
+
+.app-form {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.app-form-actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.board-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+  align-items: start;
+}
+
+.board-column {
+  border-radius: 20px;
+  padding: 1rem;
+  min-height: 260px;
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  box-shadow:
+    0 14px 30px rgba(15, 23, 42, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(6px);
+}
+
+.board-column h2 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  font-size: 1.15rem;
+}
+
+.column-saved {
+  background: linear-gradient(180deg, rgba(219, 234, 254, 0.95), rgba(239, 246, 255, 0.92));
+}
+
+.column-applied {
+  background: linear-gradient(180deg, rgba(224, 231, 255, 0.95), rgba(238, 242, 255, 0.92));
+}
+
+.column-interview {
+  background: linear-gradient(180deg, rgba(216, 249, 235, 0.95), rgba(236, 253, 245, 0.92));
+}
+
+.column-offer {
+  background: linear-gradient(180deg, rgba(254, 249, 195, 0.96), rgba(254, 252, 232, 0.92));
+}
+
+.column-rejected {
+  background: linear-gradient(180deg, rgba(254, 226, 226, 0.96), rgba(254, 242, 242, 0.92));
+}
+
+.column-empty {
+  color: #6b7280;
+}
+
+.card-list {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.application-card {
+  border-radius: 16px;
+  padding: 0.9rem;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  box-shadow:
+    0 8px 22px rgba(15, 23, 42, 0.08),
+    0 2px 6px rgba(15, 23, 42, 0.04);
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease,
+    border-color 180ms ease;
+}
+
+.application-card:hover {
+  transform: translateY(-4px) scale(1.01);
+  box-shadow:
+    0 16px 30px rgba(15, 23, 42, 0.12),
+    0 4px 10px rgba(15, 23, 42, 0.05);
+  border-color: rgba(99, 102, 241, 0.35);
+}
+
+.application-card.editing {
+  border-color: rgba(99, 102, 241, 0.4);
+  box-shadow:
+    0 0 0 3px rgba(99, 102, 241, 0.12),
+    0 12px 28px rgba(15, 23, 42, 0.10);
+}
+
+.application-card h3 {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  font-size: 1.05rem;
+}
+
+.card-meta {
+  margin: 0 0 0.5rem 0;
+  color: #374151;
+}
+
+.card-controls {
+  display: grid;
+  gap: 0.6rem;
+  margin-top: 0.75rem;
+}
+
+.card-button-row {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.text-error {
+  color: #b91c1c;
 }
