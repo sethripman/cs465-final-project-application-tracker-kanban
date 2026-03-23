@@ -35,6 +35,23 @@ function toDateTimeLocalValue(value: string | null): string {
   return localDate.toISOString().slice(0, 16);
 }
 
+function getColumnClassName(status: ApplicationStatus): string {
+  switch (status) {
+    case "SAVED":
+      return "board-column column-saved";
+    case "APPLIED":
+      return "board-column column-applied";
+    case "INTERVIEW":
+      return "board-column column-interview";
+    case "OFFER":
+      return "board-column column-offer";
+    case "REJECTED":
+      return "board-column column-rejected";
+    default:
+      return "board-column";
+  }
+}
+
 export default function BoardPage() {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
@@ -181,23 +198,14 @@ export default function BoardPage() {
   }
 
   return (
-    <main style={{ padding: "1.5rem" }}>
-      <header
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          gap: "1rem",
-          marginBottom: "1.5rem",
-          flexWrap: "wrap",
-        }}
-      >
+    <main className="board-page">
+      <header className="board-header">
         <div>
-          <h1 style={{ margin: 0 }}>Job Tracker Board</h1>
-          <p style={{ marginTop: "0.5rem" }}>Logged in as {user?.email}</p>
+          <h1 className="board-title">Job Tracker Board</h1>
+          <p className="board-subtitle">Logged in as {user?.email}</p>
         </div>
 
-        <div style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap" }}>
+        <div className="board-actions">
           <button
             onClick={() => {
               setShowCreateForm((prev) => !prev);
@@ -211,15 +219,7 @@ export default function BoardPage() {
       </header>
 
       {showCreateForm ? (
-        <section
-          style={{
-            marginBottom: "1.5rem",
-            padding: "1rem",
-            border: "1px solid #ccc",
-            borderRadius: "8px",
-            background: "#fff",
-          }}
-        >
+        <section className="board-form-panel">
           <h2>Create Application</h2>
           <ApplicationForm
             submitLabel="Create Application"
@@ -230,55 +230,34 @@ export default function BoardPage() {
       ) : null}
 
       {loading ? <p>Loading applications...</p> : null}
-      {error ? <p style={{ color: "crimson" }}>{error}</p> : null}
+      {error ? <p className="text-error">{error}</p> : null}
 
       {!loading && !error ? (
-        <section
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
-            gap: "1rem",
-            alignItems: "start",
-          }}
-        >
+        <section className="board-grid">
           {APPLICATION_STATUSES.map((status) => {
             const items = groupedApplications[status];
 
             return (
-              <div
-                key={status}
-                style={{
-                  border: "1px solid #ccc",
-                  borderRadius: "8px",
-                  padding: "1rem",
-                  background: "#f8f8f8",
-                  minHeight: "250px",
-                }}
-              >
-                <h2 style={{ marginTop: 0 }}>
+              <div key={status} className={getColumnClassName(status)}>
+                <h2>
                   {STATUS_LABELS[status]} ({items.length})
                 </h2>
 
                 {items.length === 0 ? (
-                  <p style={{ color: "#666" }}>No applications</p>
+                  <p className="column-empty">No applications</p>
                 ) : (
-                  <div style={{ display: "grid", gap: "0.75rem" }}>
+                  <div className="card-list">
                     {items.map((application) => {
                       const isEditing = editingId === application.id;
 
                       return (
                         <article
                           key={application.id}
-                          style={{
-                            border: "1px solid #ddd",
-                            borderRadius: "8px",
-                            padding: "0.75rem",
-                            background: "#fff",
-                          }}
+                          className={`application-card${isEditing ? " editing" : ""}`}
                         >
                           {isEditing ? (
                             <>
-                              <h3 style={{ marginTop: 0 }}>Edit Application</h3>
+                              <h3>Edit Application</h3>
                               <ApplicationForm
                                 submitLabel="Save Changes"
                                 initialValues={{
@@ -301,28 +280,26 @@ export default function BoardPage() {
                             </>
                           ) : (
                             <>
-                              <h3 style={{ marginTop: 0, marginBottom: "0.5rem" }}>
-                                {application.company}
-                              </h3>
+                              <h3>{application.company}</h3>
 
-                              <p style={{ margin: "0 0 0.5rem 0" }}>
+                              <p className="card-meta">
                                 <strong>Role:</strong> {application.roleTitle}
                               </p>
 
                               {application.location ? (
-                                <p style={{ margin: "0 0 0.5rem 0" }}>
+                                <p className="card-meta">
                                   <strong>Location:</strong> {application.location}
                                 </p>
                               ) : null}
 
                               {application.salaryRange ? (
-                                <p style={{ margin: "0 0 0.5rem 0" }}>
+                                <p className="card-meta">
                                   <strong>Salary:</strong> {application.salaryRange}
                                 </p>
                               ) : null}
 
                               {application.url ? (
-                                <p style={{ margin: "0 0 0.5rem 0" }}>
+                                <p className="card-meta">
                                   <strong>Link:</strong>{" "}
                                   <a
                                     href={application.url}
@@ -335,7 +312,7 @@ export default function BoardPage() {
                               ) : null}
 
                               {application.appliedDate ? (
-                                <p style={{ margin: "0 0 0.5rem 0" }}>
+                                <p className="card-meta">
                                   <strong>Applied:</strong>{" "}
                                   {new Date(
                                     application.appliedDate
@@ -344,20 +321,20 @@ export default function BoardPage() {
                               ) : null}
 
                               {application.notes ? (
-                                <p style={{ margin: "0 0 0.75rem 0" }}>
+                                <p className="card-meta">
                                   <strong>Notes:</strong> {application.notes}
                                 </p>
                               ) : null}
 
-                              <div
-                                style={{
-                                  display: "grid",
-                                  gap: "0.5rem",
-                                  marginTop: "0.75rem",
-                                }}
-                              >
+                              <div className="card-controls">
                                 <label>
-                                  <span style={{ display: "block", marginBottom: "0.25rem" }}>
+                                  <span
+                                    style={{
+                                      display: "block",
+                                      marginBottom: "0.25rem",
+                                      fontWeight: 500,
+                                    }}
+                                  >
                                     Change Status
                                   </span>
                                   <select
@@ -378,13 +355,7 @@ export default function BoardPage() {
                                   </select>
                                 </label>
 
-                                <div
-                                  style={{
-                                    display: "flex",
-                                    gap: "0.5rem",
-                                    flexWrap: "wrap",
-                                  }}
-                                >
+                                <div className="card-button-row">
                                   <button
                                     type="button"
                                     onClick={() => {
