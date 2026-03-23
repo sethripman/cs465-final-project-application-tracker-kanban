@@ -144,11 +144,11 @@ npm run dev
 - frontend will run at http://localhost:5173
 
 - You can now:
-  Register a new account
-  Log in
-  Create job applications
-  Move applications through workflow stages
-  Edit or delete entries
+  - Register a new account
+  - Log in
+  - Create job applications
+  - Move applications through workflow stages
+  - Edit or delete entries
 
 ---
 
